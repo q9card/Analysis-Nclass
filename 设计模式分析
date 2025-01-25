@@ -1,0 +1,89 @@
+//ImageComboBox 和 ImageComboBoxItem 是组合模式的关键组成部分
+//组合模式
+public class ImageComboBox : ComboBox
+{
+    public ImageList { get; set; }
+    
+    public new ImageComboBoxItem SelectedItem
+    {
+        get { return base.SelectedItem as ImageComboBoxItem; }
+        set { base.SelectedItem = value; }
+    }
+}
+public class ImageComboBoxItem
+{
+    public string Text { get; set; }
+    public Image { get; set; }
+    public Object Tag { get; set; }
+
+    public override string ToString()
+    {
+        return Text;
+    }
+}
+
+//策略模式主要体现在 ImageComboBox 和 ControlDrawHelper 的交互上。
+public class DataGridViewImageComboBoxColumnCell : DataGridViewComboBoxCell
+{
+    public override Type EditType
+    {
+        get { return typeof(DataGridViewImageComboBoxEditingControl); }
+    }
+}
+
+
+//ControlDrawHelper 提供了 DrawImageComboBoxItem 方法，这个方法可以被视为策略方法，它定义了绘制项的行为。
+//在 ControlDrawHelper 类中，你可能会实现多个绘制算法（策略），例如：绘制带有图像的项，通过调用 ControlDrawHelper.DrawImageComboBoxItem 方法，ImageComboBox 类选择具体的绘制策略，而不需要了解该策略的具体实现。
+
+//观察者模式的使用体现在 DataGridViewImageComboBoxEditingControl 类中，它通过事件机制来通知数据网格控件的状态变化。
+public class DataGridViewImageComboBoxColumnCell : DataGridViewComboBoxCell
+{
+    public override Type EditType
+    {
+        get { return typeof(DataGridViewImageComboBoxEditingControl); }
+    }
+}
+//在这个例子中，DataGridViewImageComboBoxEditingControl 充当主题。它包含一个下拉框，允许用户选择不同的项。
+
+//适配器模式主要体现在 DataGridViewImageComboBoxCell 和 DataGridViewImageComboBoxEditingControl 之间的协作。虽然这些类实现了不同的功能，但通过接口的实现，它们能够互相适配。
+public class DataGridViewImageComboBoxColumnCell : DataGridViewComboBoxCell
+{
+    public override Type EditType
+    {
+        get { return typeof(DataGridViewImageComboBoxEditingControl); }
+    }
+
+    public override void InitializeEditingControl(int rowIndex, object initialFormattedValue, DataGridViewCellStyle dataGridViewCellStyle)
+    {
+        base.InitializeEditingControl(rowIndex, initialFormattedValue, dataGridViewCellStyle);
+        DataGridViewImageComboBoxEditingControl control = DataGridView.EditingControl as DataGridViewImageComboBoxEditingControl;
+        // 初始化代码...
+    }
+}
+
+//迭代器模式
+//NRArgumentListDeclaration
+Public class NRArgumentListDeclaration : ICSharpArgumentListDeclaration<NRParameterDeclaration>
+{
+    readonly IEnumerable<NRParameter> parameters;
+
+    public NRArgumentListDeclaration(IEnumerable<NRParameter> parameters)
+    {
+        this.parameters = parameters;
+    }
+
+    public IEnumerator<NRParameterDeclaration> GetEnumerator()
+    {
+        foreach (var parameter in parameters)
+        {
+            yield return new NRParameterDeclaration(parameter);
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+}
+//迭代器模式角色：NRArgumentListDeclaration 类实现了迭代器模式，使得外部代码能够逐个访问其内部的 NRParameter 对象。
+
